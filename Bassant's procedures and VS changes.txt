@@ -1,0 +1,146 @@
+//Until I am familar with an editor as atom, please add the following to your version of the project along with the forms
+
+//Here are my stored procedures
+
+CREATE PROCEDURE AddSession @STypeName varchar(50),
+							@NumbOfNurses int,
+							@SPrice int,
+							@DoctorSalary int,
+							@NurseSalary int
+AS
+BEGIN
+INSERT INTO Session_Type
+(                           STypeName ,
+							NumbOfNurses ,
+							SPrice ,
+							DoctorSalary ,
+							NurseSalary 
+)
+VALUES
+(                           @STypeName ,
+							@NumbOfNurses ,
+							@SPrice ,
+							@DoctorSalary ,
+							@NurseSalary 
+)
+END
+GO
+
+CREATE PROCEDURE EditSessions @STypeID int,
+                              @STypeName varchar(50),
+							  @NumbOfNurses int,
+							  @SPrice int,
+							  @DoctorSalary int,
+							  @NurseSalary int
+AS
+BEGIN
+UPDATE Session_Type  SET STypeName = @STypeName,
+					     NumbOfNurses = @NumbOfNurses ,
+					     SPrice= @SPrice ,
+						 DoctorSalary = @DoctorSalary ,
+						 NurseSalary = @NurseSalary
+WHERE STypeID = @STypeID
+END
+GO
+
+CREATE PROCEDURE GetAllSessions 
+AS
+BEGIN
+Select * FROM Session_Type
+END
+GO
+
+CREATE PROCEDURE GetClinicTypes
+AS
+BEGIN
+SELECT ClinicTypeName FROM ClinicSetting
+END
+GO
+
+
+CREATE PROCEDURE SetClinicType @ClinicTypeName varchar(30)
+AS
+BEGIN
+UPDATE ClinicSetting SET Selected = 'T'
+WHERE ClinicTypeName = @ClinicTypeName
+END 
+GO
+
+CREATE PROCEDURE RemoveSessions @STypeID int
+AS
+BEGIN
+	DELETE FROM Session_Type WHERE STypeID = @STypeID
+END
+
+GO
+
+/////////////////////////////////////////////////////////////////////////
+
+//functions to be added to DBmanager
+
+public int AddSession(string type, int NoOfNurses, int price, int DSal, int NSal)
+        {
+            string StoredProcedureName = StoredProcedures.AddSession;
+            Dictionary<string, object> Parameters = new Dictionary<string, object>();
+            Parameters.Add("@STypeName", type);
+            Parameters.Add("@NumbOfNurses", NoOfNurses);
+            Parameters.Add("@SPrice", price);
+            Parameters.Add("@DoctorSalary", DSal);
+            Parameters.Add("@NurseSalary", NSal);
+    
+            return ExecuteNonQuery(StoredProcedureName, Parameters);
+        }
+
+        public DataTable GetAllSessions()
+        {
+            string StoredProcedureName = StoredProcedures.GetAllSessions;
+  
+            return ExecuteReader(StoredProcedureName, null);
+        }
+
+        public int RemoveSessions(int ID)
+        {
+            string StoredProcedureName = StoredProcedures.RemoveSessions;
+            Dictionary<string, object> Parameters = new Dictionary<string, object>();
+            Parameters.Add("@STypeID", ID);
+            return ExecuteNonQuery(StoredProcedureName, Parameters);
+        }
+
+        public int EditSessions(int ID, string type, int NoOfNurses, int price, int DSal, int NSal)
+        {
+            string StoredProcedureName = StoredProcedures.EditSessions;
+            Dictionary<string, object> Parameters = new Dictionary<string, object>();
+            Parameters.Add("@STypeID", ID);
+            Parameters.Add("@STypeName", type);
+            Parameters.Add("@NumbOfNurses", NoOfNurses);
+            Parameters.Add("@SPrice", price);
+            Parameters.Add("@DoctorSalary", DSal);
+            Parameters.Add("@NurseSalary", NSal);
+            return ExecuteNonQuery(StoredProcedureName, Parameters);
+        }
+
+        public DataTable GetClinicTypes()
+        {
+            string StoredProcedureName = StoredProcedures.GetClinicTypes;
+
+            return ExecuteReader(StoredProcedureName, null);
+        }
+
+        public int SetClinicType(string name)
+        {
+            string StoredProcedureName = StoredProcedures.SetClinicType;
+            Dictionary<string, object> Parameters = new Dictionary<string, object>();
+            Parameters.Add("@ClinicTypeName", name);
+            
+            return ExecuteNonQuery(StoredProcedureName, Parameters);
+        }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+//in the StoredProcedures Class
+
+public static string AddSession = "AddSession";
+public static string GetAllSessions = "GetAllSessions";
+public static string RemoveSessions = "RemoveSessions" ;
+public static string EditSessions = "EditSessions";
+public static string GetClinicTypes = "GetClinicTypes";
+public static string SetClinicType = "SetClinicType";
